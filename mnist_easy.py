@@ -1,58 +1,40 @@
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
-# 读取mnist张量集
+# 获取数据（如果存在就读取，不存在就下载完再读取）
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
 
-# 我们通过操作符号变量来描述这些可交互的操作单元，可以用下面的方式创建一个
-# x不是一个特定的值，而是一个占位符placeholder
-x = tf.placeholder("float", [None, 784])
+# 输入
+x = tf.placeholder("float", [None, 784])  #输入占位符（每张手写数字784个像素点）
+y_ = tf.placeholder("float", [None, 10])  #输入占位符（这张手写数字具体代表的值，0-9对应矩阵的10个位置）
 
-# 模型也需要权重值和偏置量
-# 一个Variable代表一个可修改的张量，存在在TensorFlow的用于描述交互性操作的图中
-W = tf.Variable(tf.zeros([784,10]))
-b = tf.Variable(tf.zeros([10]))
-y = tf.nn.softmax(tf.matmul(x,W) + b)
+# 计算分类softmax会将xW+b分成10类，对应0-9
+W = tf.Variable(tf.zeros([784, 10]))  #权重
+b = tf.Variable(tf.zeros([10]))  #偏置
+y = tf.nn.softmax(tf.matmul(x, W) +
+                  b)  # 输入矩阵x与权重矩阵W相乘，加上偏置矩阵b，然后求softmax（sigmoid函数升级版，可以分成多类）
 
-# 训练模型
+# 计算偏差和
+cross_entropy = -tf.reduce_sum(y_ * tf.log(y))
 
-# 为了实现交叉熵，我们需要先添加一个新的占位符来输入正确答案
-y_ = tf.placeholder(tf.float32, [None, 10])
+# 使用梯度下降法（步长0.01），来使偏差和最小
+train_step = tf.train.GradientDescentOptimizer(0.01).minimize(cross_entropy)
 
-# 然后我们可以实现交叉熵函数：
-# tf.reduce_mean计算批次中所有示例的平均值
-cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
+# 初始化变量
+init = tf.global_variables_initializer()
+sess = tf.Session()
+sess.run(init)
 
-# 我们要求TensorFlow用梯度下降算法（gradient descent algorithm）以0.05的学习速率最小化交叉熵
-train_step = tf.train.GradientDescentOptimizer(0.05).minimize(cross_entropy)
+for i in range(10):  # 训练10次
+    batch_xs, batch_ys = mnist.train.next_batch(100)  # 随机取100个手写数字图片
+    rt = sess.run(
+            train_step,
+            feed_dict={x: batch_xs,
+                        y_: batch_ys})  # 执行梯度下降算法，输入值x：batch_xs，输入值y：batch_ys
 
-# 在一个Session里面启动我们的模型，并且初始化变量
-sess = tf.InteractiveSession()
-tf.global_variables_initializer().run()
-
-# 我们来训练 - 我们将运行1000次训练步骤！
-for _ in range(10):
-    # 循环的每一步，我们从训练集中得到一百个随机数据点的“批次”。我们运行train_step饲料中的批次数据来代替placeholders
-    batch_xs, batch_ys = mnist.train.next_batch(100)
-    sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
-
-#评估我们的模型
-
-# 我们的模型做得如何？
-# 那么首先我们来弄清楚我们预测正确的标签。tf.argmax 是一个非常有用的功能，
-# 它给出沿某个轴的张量中最高条目的索引。
-# 例如，tf.argmax(y,1)我们的模型认为是每个输入最有可能的标签，
-# tf.argmax(y_,1)而是正确的标签。
-# 我们可以tf.equal用来检查我们的预测是否符合真相。
-ymax = tf.argmax(y, 1)
-_ymax = tf.argmax(y_, 1)
-print(ymax)
-print(_ymax)
-correct_prediction = tf.equal(ymax, _ymax)
-
-# 这给了我们一个布尔的列表。为了确定哪个部分是正确的，
-# 我们转换为浮点数，然后取平均值。
-# 例如， [True, False, True, True]会变成[1,0,1,1]哪一个0.75。
-
-accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
-print(sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels}))
+# 计算训练精度
+correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+print(sess.run(
+    accuracy, feed_dict={x: mnist.test.images,
+                         y_: mnist.test.labels}))  #运行精度图，x和y_从测试手写图片中取值
