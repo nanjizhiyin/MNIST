@@ -1,3 +1,5 @@
+# 源码网址 https://niektemme.com/2016/02/21/tensorflow-handwriting/
+
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
 
@@ -21,20 +23,25 @@ cross_entropy = -tf.reduce_sum(y_ * tf.log(y))
 train_step = tf.train.GradientDescentOptimizer(0.01).minimize(cross_entropy)
 
 # 初始化变量
+saver = tf.train.Saver()
 init = tf.global_variables_initializer()
 sess = tf.Session()
 sess.run(init)
 
-for i in range(10):  # 训练10次
+for i in range(20000):  # 训练10次
     batch_xs, batch_ys = mnist.train.next_batch(100)  # 随机取100个手写数字图片
     rt = sess.run(
             train_step,
             feed_dict={x: batch_xs,
                         y_: batch_ys})  # 执行梯度下降算法，输入值x：batch_xs，输入值y：batch_ys
 
-# 计算训练精度
-correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
-accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-print(sess.run(
-    accuracy, feed_dict={x: mnist.test.images,
-                         y_: mnist.test.labels}))  #运行精度图，x和y_从测试手写图片中取值
+# 保存训练模型
+save_path = saver.save(sess, "ckpt/model.ckpt")
+print("Model saved in file: ", save_path)
+
+# # 计算训练精度
+# correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+# accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+# print(sess.run(
+#     accuracy, feed_dict={x: mnist.test.images,
+#                          y_: mnist.test.labels}))  #运行精度图，x和y_从测试手写图片中取值
