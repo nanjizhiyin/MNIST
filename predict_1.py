@@ -42,24 +42,13 @@ def predictint(imvalue):
     b = tf.Variable(tf.zeros([10]))
     y = tf.nn.softmax(tf.matmul(x, W) + b)
 
-    init_op = tf.initialize_all_variables()
     saver = tf.train.Saver()
-
-    """
-    Load the model.ckpt file
-    file is stored in the same directory as this python script is started
-    Use the model to predict the integer. Integer is returend as list.
-
-    Based on the documentatoin at
-    https://www.tensorflow.org/versions/master/how_tos/variables/index.html
-    """
-    with tf.Session() as sess:
-        sess.run(init_op)
-        saver.restore(sess, "ckpt/model.ckpt")
-        #print ("Model restored.")
-
-        prediction=tf.argmax(y,1)
-        return prediction.eval(feed_dict={x: [imvalue]}, session=sess)
+    init_op = tf.global_variables_initializer()
+    sess = tf.Session()
+    sess.run(init_op)
+    saver.restore(sess, "ckpt/model.ckpt")
+    prediction=tf.argmax(y,1)
+    return prediction.eval(feed_dict={x: [imvalue]}, session=sess)
 
 
 def imageprepare(argv):
@@ -111,4 +100,4 @@ def main(argv):
     print (predint[0]) #first value in list
 
 if __name__ == "__main__":
-    main("4.png")
+    main("9.bmp")

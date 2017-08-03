@@ -28,12 +28,12 @@ init = tf.global_variables_initializer()
 sess = tf.Session()
 sess.run(init)
 
-for i in range(20000):  # 训练10次
+for i in range(20000):  # 训练20000次
     batch_xs, batch_ys = mnist.train.next_batch(100)  # 随机取100个手写数字图片
-    rt = sess.run(
-            train_step,
-            feed_dict={x: batch_xs,
-                        y_: batch_ys})  # 执行梯度下降算法，输入值x：batch_xs，输入值y：batch_ys
+    sess.run(
+        train_step,
+        feed_dict={x: batch_xs,
+                   y_: batch_ys})  # 执行梯度下降算法，输入值x：batch_xs，输入值y：batch_ys
 
 # 保存训练模型
 save_path = saver.save(sess, "ckpt/model.ckpt")
