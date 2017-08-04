@@ -26,9 +26,11 @@ http://niektemme.com/ @@to do
 """
 
 #import modules
+from __future__ import print_function
 import sys
 import tensorflow as tf
-from PIL import Image,ImageFilter
+from PIL import Image, ImageFilter
+import numpy as np
 
 def predictint(imvalue):
     """
@@ -46,7 +48,7 @@ def predictint(imvalue):
     init_op = tf.global_variables_initializer()
     sess = tf.Session()
     sess.run(init_op)
-    saver.restore(sess, "ckpt/model.ckpt")
+    saver.restore(sess, "ckpt1/model1.ckpt")
     prediction=tf.argmax(y,1)
     return prediction.eval(feed_dict={x: [imvalue]}, session=sess)
 
@@ -56,6 +58,30 @@ def imageprepare(argv):
     This function returns the pixel values.
     The imput is a png file location.
     """
+    # # 读取图片转成灰度格式
+    # img = Image.open(argv).convert('L')
+
+    # # resize的过程
+    # if img.size[0] != 28 or img.size[1] != 28:
+    #     img = img.resize((28, 28))
+
+    # # 暂存像素值的一维数组
+    # arr = []
+
+    # for i in range(28):
+    #     for j in range(28):
+    #         # mnist 里的颜色是0代表白色（背景），1.0代表黑色
+    #         pixel = 1.0 - float(img.getpixel((j, i)))/255.0
+    #         # pixel = 255.0 - float(img.getpixel((j, i))) # 如果是0-255的颜色值
+    #         # print pixel
+    #         print('%3d'%(pixel*100), end='')
+    #         arr.append(pixel)
+    #     print('')
+
+    # # arr1 = np.array(arr).reshape((1, 28, 28, 1))
+    # return arr
+
+
     im = Image.open(argv).convert('L')
     width = float(im.size[0])
     height = float(im.size[1])
@@ -80,14 +106,13 @@ def imageprepare(argv):
         wleft = int(round(((28 - nwidth)/2),0)) #caculate vertical pozition
         newImage.paste(img, (wleft, 4)) #paste resized image on white canvas
 
-    #newImage.save("sample.png")
+    newImage.save("sample.png")
 
     tv = list(newImage.getdata()) #get pixel values
 
     #normalize pixels to 0 and 1. 0 is pure white, 1 is pure black.
     tva = [ (255-x)*1.0/255.0 for x in tv]
     return tva
-    #print(tva)
 
 def main(argv):
     """
