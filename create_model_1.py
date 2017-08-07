@@ -1,4 +1,5 @@
 # 源码网址 https://niektemme.com/2016/02/21/tensorflow-handwriting/
+from __future__ import print_function
 import os
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
@@ -39,8 +40,20 @@ if os.path.exists(ckptPath + 'checkpoint'):  #判断模型是否存在
 else:
     tf.global_variables_initializer().run()  #不存在就初始化变量
 
-for i in range(100):  # 训练20000次
-    batch_xs, batch_ys = mnist.train.next_batch(100)  # 随机取100个手写数字图片
+for i in range(1):  # 训练20000次
+    batch_xs, batch_ys = mnist.train.next_batch(1)  # 随机取100个手写数字图片
+
+    # print("图片：%s, 标签:%s" % (batch_xs, batch_ys))
+
+    # # 查看第一张图片
+    # batch_x = batch_xs[0]
+    # for m in range(28):
+    #     for j in range(28):
+    #         pixel = batch_x[m*28 + j]
+    #         print('%3d' % (pixel*100), end='')
+    #     print('')
+
+
     _, loss_value = sess.run(
         [train_step,loss],
         feed_dict={x: batch_xs,
