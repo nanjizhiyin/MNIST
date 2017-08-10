@@ -24,7 +24,7 @@ void copy_int(uint32_t *target, unsigned char *src)
 
 int read_lables()
 {
-    FILE *fp = fopen("./train-labels-idx1-ubyte", "r");
+    FILE *fp = fopen("../MNIST_data/train-labels-idx1-ubyte", "r");
     if (NULL == fp)
     {
         return -1;
