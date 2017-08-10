@@ -3,6 +3,8 @@ from __future__ import print_function
 import os
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
+import numpy as np
+import scipy.ndimage
 
 # 获取数据（如果存在就读取，不存在就下载完再读取）
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
@@ -23,7 +25,7 @@ y_ = tf.placeholder("float", [None, 10])
 loss = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
 
 # 使用梯度下降法（步长0.01），来使偏差和最小
-train_step = tf.train.GradientDescentOptimizer(0.1).minimize(loss)
+train_step = tf.train.GradientDescentOptimizer(0.01).minimize(loss)
 
 # 初始化变量
 sess = tf.InteractiveSession()
@@ -40,8 +42,8 @@ if os.path.exists(ckptPath + 'checkpoint'):  #判断模型是否存在
 else:
     tf.global_variables_initializer().run()  #不存在就初始化变量
 
-for i in range(1):  # 训练20000次
-    batch_xs, batch_ys = mnist.train.next_batch(1)  # 随机取100个手写数字图片
+for i in range(10):  # 训练20000次
+    batch_xs, batch_ys = mnist.train.next_batch(10)  # 随机取100个手写数字图片
 
     # print("图片：%s, 标签:%s" % (batch_xs, batch_ys))
 
@@ -68,7 +70,14 @@ for i in range(1):  # 训练20000次
     #         'model1.ckpt')
     #     print("模型保存：%s 当前训练损失：%s" % (save_path, loss_value))
 
-print("训练结束")
+print("训练MNIST图片结束")
+
+# 训练自己的图片
+tmpData = np.vectorize(lambda x: 255 - x)(np.ndarray.flatten(scipy.ndimage.imread("4.png", flatten=True)))
+
+result = sess.run(tf.argmax(y, 1), feed_dict={x: [tmpData]})
+
+print("训练结束"+result)
 
 # 保存训练模型
 save_path = saver.save(sess, ckptPath + 'model1.ckpt')
