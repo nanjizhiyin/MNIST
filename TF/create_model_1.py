@@ -44,8 +44,8 @@ if os.path.exists(ckptPath + 'checkpoint'):  #判断模型是否存在
 else:
     tf.global_variables_initializer().run()  #不存在就初始化变量
 
-for i in range(1):  # 训练20000次
-    batch_xs, batch_ys = mnist.train.next_batch(10)  # 随机取100个手写数字图片
+for i in range(1000):  # 训练20000次
+    batch_xs, batch_ys = mnist.train.next_batch(100)  # 随机取100个手写数字图片
     sess.run(
         train_step,
         feed_dict={x: batch_xs,
@@ -55,13 +55,13 @@ for i in range(1):  # 训练20000次
 
     # 查看第一张图片
     # batch_x = batch_xs[0]
-    for batch_x in batch_xs:
-        for m in range(28):
-            for j in range(28):
-                pixel = batch_x[m*28 + j]
-                print('%3d' % (pixel*100), end='')
-            print('')
-        print('-------------淫荡的分割线--------------')
+    # for batch_x in batch_xs:
+    #     for m in range(28):
+    #         for j in range(28):
+    #             pixel = batch_x[m*28 + j]
+    #             print('%3d' % (pixel*100), end='')
+    #         print('')
+    #     print('-------------淫荡的分割线--------------')
 
 
     # _, loss_value = sess.run(
