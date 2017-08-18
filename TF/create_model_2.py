@@ -101,16 +101,16 @@ https://www.tensorflow.org/versions/master/how_tos/variables/index.html
 """
 saver = tf.train.Saver()
 sess.run(tf.global_variables_initializer())
-keep_prob = 0.01
-for i in range(100):
-    batch = mnist.train.next_batch(100)
+keep_prob_size = 1.0
+for i in range(2000):
+    batch = mnist.train.next_batch(50)
     if i % 100 == 0:
         train_accuracy = accuracy.eval(
             feed_dict={x: batch[0],
                        y_: batch[1],
-                       keep_prob: keep_prob})
+                       keep_prob: keep_prob_size})
         print("step %d, training accuracy %g" % (i, train_accuracy))
-    train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: keep_prob})
+    train_step.run(feed_dict={x: batch[0], y_: batch[1], keep_prob: 0.5})
 
 save_path = saver.save(sess, "ckpt2/model2.ckpt")
 print("Model saved in file: ", save_path)
@@ -118,4 +118,4 @@ print("Model saved in file: ", save_path)
 print("test accuracy %g" % accuracy.eval(
     feed_dict={x: mnist.test.images,
                y_: mnist.test.labels,
-               keep_prob: keep_prob}))
+               keep_prob: keep_prob_size}))
