@@ -5,11 +5,9 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 import tensorflow as tf
 from tensorflow.examples.tutorials.mnist import input_data
-import numpy as np
-import scipy.ndimage
 
 # 获取数据（如果存在就读取，不存在就下载完再读取）
-mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
+mnist = input_data.read_data_sets("MNIST_data/", one_hot=True, validation_size=184)
 
 # 计算分类softmax会将xW+b分成10类，对应0-9
 W = tf.Variable(tf.zeros([784, 10]))  #权重
@@ -85,12 +83,12 @@ print("训练MNIST图片结束")
 save_path = saver.save(sess, ckptPath + 'model1.ckpt')
 print("模型保存：%s" % (save_path))
 
-# # 计算训练精度
-# correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
-# accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
-# print(sess.run(
-#     accuracy, feed_dict={x: mnist.test.images,
-#                          y_: mnist.test.labels}))  #运行精度图，x和y_从测试手写图片中取值
+# 计算训练精度
+correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+print(sess.run(
+    accuracy, feed_dict={x: mnist.test.images,
+                         y_: mnist.test.labels}))  #运行精度图，x和y_从测试手写图片中取值
 
 # 关闭session
 # sess.close()

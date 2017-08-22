@@ -126,4 +126,4 @@ def main(argv):
     print (predint[0]) #first value in list
 
 if __name__ == "__main__":
-    main("image/im2557.png")
+    main("image/02.png")
